@@ -7,6 +7,8 @@ networks:
 services:
 
   target: 
+    build: ansible-target
+    image: ansible-target 
     container_name: ansible-target
     image: ansible-target
     networks:
@@ -17,9 +19,13 @@ services:
     privileged: true
 
   server:
+    build: ansible-server
+    image: ansible-server 
     depends_on:
       - target
     container_name: ansible-server
     image: ansible-server
     networks:
       - network
+    volumes:
+      - /tmp/playbooks:/playbooks

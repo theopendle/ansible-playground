@@ -8,13 +8,12 @@ RUN yum -y update && \
     yum -y clean all
 
 COPY ansible_hosts /etc/ansible/hosts
+COPY ssh_config /etc/ssh/ssh_config
 
-RUN mkdir $HOME/playbooks
-COPY httpd_playbook.yaml /root/playbooks/test
+COPY run_playbook.sh /
+RUN chmod 755 /run_playbook.sh
 
-RUN ssh-keygen -q -t rsa -N "" -f $HOME/.ssh/id_rsa && \
-    echo "StrictHostKeyChecking no" > $HOME/.ssh/config
+RUN ssh-keygen -q -t rsa -N "" -f $HOME/.ssh/id_rsa
 
-ENTRYPOINT sshpass -p "root" ssh-copy-id -i $HOME/.ssh/id_rsa root@ansible-target >> $HOME/log && \
+ENTRYPOINT sshpass -p "root" ssh-copy-id -i $HOME/.ssh/id_rsa root@ansible-target && \
     tail -f /dev/null
-# CMD ansible all -m ping

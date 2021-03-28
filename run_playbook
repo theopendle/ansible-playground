@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker exec -it ansible-server bash -c "/run_playbook.sh ${1}"
