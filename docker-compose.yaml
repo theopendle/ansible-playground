@@ -11,6 +11,9 @@ services:
     image: ansible-target
     networks:
       - network
+    ports:
+      - 6080:80
+      - 6443:443
     privileged: true
 
   server:

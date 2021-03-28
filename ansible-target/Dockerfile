@@ -11,7 +11,7 @@ RUN yum -y update && \
 RUN echo "root:root" | chpasswd && \
     ssh-keygen -A
 
-EXPOSE 22
+EXPOSE 22 80 443
 
 CMD /sbin/init systemctl start sshd
     
