@@ -1,0 +1,22 @@
+version: "3.7"
+
+networks:
+  network:
+    driver: bridge
+
+services:
+
+  target: 
+    container_name: ansible-target
+    image: ansible-target
+    networks:
+      - network
+    privileged: true
+
+  server:
+    depends_on:
+      - target
+    container_name: ansible-server
+    image: ansible-server
+    networks:
+      - network
