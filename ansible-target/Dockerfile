@@ -8,8 +8,7 @@ RUN yum -y update && \
     yum -y clean all
 
 # Set up root acess via SSH
-RUN echo "root:root" | chpasswd && \
-    ssh-keygen -A
+RUN echo "root:root" | chpasswd
 
 EXPOSE 22 80 443
 
