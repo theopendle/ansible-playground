@@ -28,4 +28,4 @@ services:
     networks:
       - network
     volumes:
-      - /tmp/playbooks:/playbooks
+      - ./playbooks:/playbooks
