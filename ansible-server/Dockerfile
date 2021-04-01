@@ -4,7 +4,7 @@ USER root
 
 RUN yum -y update && \
     yum -y install epel-release && \
-    yum -y install openssh-clients ansible && \
+    yum -y install sudo openssh-clients ansible && \
     yum -y clean all
 
 COPY ansible_hosts /etc/ansible/hosts
