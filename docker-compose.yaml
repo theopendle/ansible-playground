@@ -29,3 +29,4 @@ services:
       - network
     volumes:
       - ./playbooks:/playbooks
+    tty: true
