@@ -15,25 +15,24 @@ This solution takes teh form of two docker containers:
 
 ### Run the environment
 
-Use the following commands to build and run the environment:
+Use the following commands to build and run the environment from scratch:
 
 ```bash
-docker-compose build
-docker-compose up
+docker-compose rm && docker-compose build && docker-compose up
 ```
 
 ### Provide an ansible playbook
 
-The environment includes a volume mounted on you local `/tmp/playbooks`. To provide an ansible playbook, simply copy it to that location:
+The environment includes a volume mounted on the `playbooks` directory. To provide an ansible playbook, simply code in that location, or copy an existing file to that location:
 
 ```bash
-cp <you-playbook-path> /tmp/playbooks/
+cp <you-playbook-path> playbooks
 ```
 
 For example:
 
 ```bash
-cp ansible-server/httpd_playbook.yaml /tmp/playbooks/
+cp /tmp/httpd_playbook.yaml playbooks/
 ```
 
 ### Trigger execution
@@ -50,6 +49,10 @@ For example:
 ```
 
 The output from the execution of the playbook will be printed to the console.
+
+### Providing artifacts
+
+If your playbook requires some artifacts (binary files, installers, assets, etc.) then you can place them in `ansible-target/artifacts` and they will be loaded into the target container's `/prod/pf/work` directory.
 
 ### Testing the result
 
