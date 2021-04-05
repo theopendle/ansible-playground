@@ -20,6 +20,3 @@ RUN useradd -m -s /bin/bash -u 2000 ansible && \
 USER ansible
 
 RUN ssh-keygen -q -t rsa -N "" -f $HOME/.ssh/id_rsa
-
-ENTRYPOINT sshpass -p ansible ssh-copy-id -i $HOME/.ssh/id_rsa ansible@ansible-target && \
-    tail -f /dev/null
