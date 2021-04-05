@@ -55,7 +55,7 @@
         state: directory
         owner: jupyter
         group: jupyter
-        mode: u=rwx,g=rwx,o=r
+        mode: u=rwx,g=rwx,o=rx
         recurse: yes
       
     - name: Check if Python packages are installed
@@ -84,13 +84,14 @@
       become: true
       file:
         dest: /install.sh
-        mode: u=rwx,g=rwx,o=r
         owner: jupyter
+        group: jupyter
+        mode: u=rwx,g=rwx,o=rx
     
     - name: Execute python dependency installation script
       when: python_packages_installed.changed
-      become_user: jupyter
       become: true
+      become_user: jupyter
       shell: bash /install.sh
       register: installation
 
@@ -98,31 +99,87 @@
       when: python_packages_installed.changed
 
     - name: Create configuration folder
-      become_user: jupyter
       become: true
+      become_user: jupyter
       file: 
         dest: /opt/jupyterhub/etc/jupyterhub
         state: directory
 
     - name: Create configuration file
-      become_user: jupyter
       become: true
+      become_user: jupyter
       copy:
         dest: /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
         content: |
           c.Spawner.default_url = '/lab'
           c.JupyterHub.port = 80
+          c.Authenticator.allowed_users = {'app_admin'}
+          c.Authenticator.admin_users = {'app_admin'}
+
+    - name: Check if Anaconda is installed
+      become: true
+      become_user: jupyter
+      stat:
+        path: /opt/conda/condabin/conda
+      register: conda_installed
+    
+    - name: Install Anaconda
+      when: not conda_installed.stat.exists
+      become: true
+      command: bash /prod/pf/work/anaconda_installer.sh -b -p /opt/conda
+
+    - name: Load conda on user login
+      become: true
+      file:
+        src: /opt/conda/etc/profile.d/conda.sh
+        dest: /etc/profile.d/conda.sh
+        state: link
+
+    - name: Create conda environment directory
+      become: true
+      file:
+        dest: /opt/conda/envs
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: u=rwx,g=rwx,o=rx
+
+    - name: Check if default environment exists
+      become: true
+      become_user: jupyter
+      stat:
+        path: /opt/conda/envs/default
+      register: conda_default
+
+    - name: Create default conda environment
+      when: not conda_default.stat.exists
+      become: true
+      become_user: jupyter
+      command: /opt/conda/bin/conda create -y --prefix /opt/conda/envs/default python=3.7 ipykernel
+
+    - name: Check if default environment is installed for Jupyter Hub
+      become: true
+      become_user: jupyter
+      stat:
+        path: /opt/jupyterhub/share/jupyter/kernels/default
+      register: conda_jupyter
+
+    - name: Install default IPython kernel in JupyterHub directory
+      when: not conda_jupyter.stat.exists
+      become: true
+      become_user: jupyter
+      command: /opt/conda/envs/default/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'default' --display-name "Default"
 
     - name: Create system service diretory
-      become_user: jupyter
       become: true
+      become_user: jupyter
       file:
         dest: /opt/jupyterhub/etc/systemd
         state: directory
 
     - name: Create system service configuration
-      become_user: jupyter
       become: true
+      become_user: jupyter
       copy:
         dest: /opt/jupyterhub/etc/systemd/jupyterhub.service
         content: |
@@ -165,4 +222,14 @@
         name: jupyterhub
         enabled: true
         daemon_reload: true
-        state: started
+        state: restarted
+
+    - name: Create application admin account
+      become: true
+      user:
+        name: app_admin
+        # password: app_admin
+        password: $1$SomeSalt$e03CSVArHQoaAkC8sPsKm0
+        uid: 2002
+        home: /home/app_admin
+        shell: /bin/bash
