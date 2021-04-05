@@ -13,6 +13,8 @@ services:
     image: ansible-target
     networks:
       - network
+    volumes:
+      - ./artifacts:/artifacts
     ports:
       - 6080:80
       - 6443:443

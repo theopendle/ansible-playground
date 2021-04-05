@@ -14,10 +14,6 @@ EXPOSE 22 80 443
 
 RUN useradd -ms /bin/bash -u 2000 ansible && \
     echo "ansible:ansible" | chpasswd && \
-    mkdir /playbooks && \
-    chown ansible:ansible /playbooks && \
     echo "ansible  ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-COPY artifacts/* /prod/pf/work/
 
 CMD /sbin/init systemctl start sshd
