@@ -52,7 +52,11 @@ The output from the execution of the playbook will be printed to the console.
 
 ### Providing artifacts
 
-If your playbook requires some artifacts (binary files, installers, assets, etc.) then you can place them in `ansible-target/artifacts` and they will be loaded into the target container's `/prod/pf/work` directory.
+If your playbook requires some artifacts (binary files, installers, assets, etc.) then you can place them in `artifacts` and they will be loaded into the target container at the same location. If you would like your artifacts to be loaded elswhere, change the following line in the `docker-compose.yaml` file:
+
+```yaml
+./artifacts:/artifacts
+```
 
 ### Testing the result
 
