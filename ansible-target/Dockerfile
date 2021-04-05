@@ -4,6 +4,7 @@ USER root
 
 # Install packages
 RUN yum -y update && \
+    yum -y install epel-release && \
     yum -y install sudo openssh-clients openssh-server && \
     yum -y clean all
 
