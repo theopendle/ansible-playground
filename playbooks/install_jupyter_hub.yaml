@@ -1,0 +1,245 @@
+---
+- hosts: servers
+  tasks:
+
+    - name: Install Python 3
+      become: true
+      yum:
+        name: 
+          - python3
+        state: latest
+    
+    - name: Check if NodeJs repos is set up
+      become: true
+      shell: yum repolist | { grep nodesource || true; }
+      register: nodejs_repo
+      changed_when: nodejs_repo.stdout_lines|length < 1
+      args: 
+        warn: false
+
+    - name: Set up NodeJs package repository
+      when: nodejs_repo.changed
+      become: true
+      script: /playbooks/install_node.sh
+
+    - name: Install NodeJs
+      when: nodejs_repo.changed
+      become: true
+      yum:
+        name: 
+          - nodejs
+        state: latest
+
+    - name: Check if HTTP proxy is installed
+      shell: npm list -g | { grep configurable-http-proxy || true; }
+      register: http_proxy_installed
+      changed_when: http_proxy_installed.stdout_lines|length < 1
+
+    - name: Install NodeJs HTTP proxy
+      when: http_proxy_installed.changed
+      become: true
+      command: npm install -g configurable-http-proxy
+
+    - name: Check if Python packages are installed
+      shell: /opt/jupyterhub/bin/python3 -m pip list | { grep -E "(wheel |jupyterhub |jupyterlab |ipywidgets )" || true; }
+      register: python_packages_installed
+      changed_when: python_packages_installed.stdout_lines|length < 1
+
+    - name: Create python dependency installation script
+      when: python_packages_installed.changed
+      become: true
+      copy:
+        dest: /install.sh
+        content: |
+          set -e
+          python3 -m venv /opt/jupyterhub/
+          /opt/jupyterhub/bin/python3 -m pip install --upgrade pip
+          /opt/jupyterhub/bin/python3 -m pip install wheel
+          /opt/jupyterhub/bin/python3 -m pip install jupyterhub
+          /opt/jupyterhub/bin/python3 -m pip install jupyterlab
+          /opt/jupyterhub/bin/python3 -m pip install ipywidgets
+    
+    - name: Make installation script executable
+      when: python_packages_installed.changed
+      become: true
+      file:
+        dest: /install.sh
+        mode: u=rwx,g=rwx,o=rx
+    
+    - name: Execute python dependency installation script
+      when: python_packages_installed.changed
+      become: true
+      ignore_errors: yes
+      shell: bash /install.sh
+      register: installation
+
+    - debug: var=installation.stdout_lines
+      when: python_packages_installed.changed
+
+    - name: Create configuration folder
+      become: true
+      file: 
+        dest: /opt/jupyterhub/etc/jupyterhub
+        state: directory
+
+    - name: Create configuration file
+      become: true
+      copy:
+        dest: /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+        content: |
+          c.Spawner.default_url = '/lab'
+          c.JupyterHub.port = 80
+
+    - name: Create system service diretory
+      become: true
+      file:
+        dest: /opt/jupyterhub/etc/systemd
+        state: directory
+
+    - name: Create system service configuration
+      become: true
+      copy:
+        dest: /opt/jupyterhub/etc/systemd/jupyterhub.service
+        content: |
+          [Unit]
+          Description=JupyterHub
+          After=syslog.target network.target
+
+          [Service]
+          User=root
+          Environment="PATH=/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/jupyterhub/bin"
+          ExecStart=/opt/jupyterhub/bin/jupyterhub -f /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+
+          [Install]
+          WantedBy=multi-user.target
+    
+    - name: Symlink system service configuration
+      become: true
+      file: 
+        src: /opt/jupyterhub/etc/systemd/jupyterhub.service
+        dest: /etc/systemd/system/jupyterhub.service
+        state: link
+
+    - name: Start service
+      become: true
+      systemd:
+        name: jupyterhub
+        enabled: true
+        daemon_reload: true
+        state: started
+
+
+#             1  python3
+#     2  yum install python3
+#     3  sudo python3 -m venv /opt/jupyterhub/
+#     4  python3 -m venv /opt/jupyterhub/
+#     5  /opt/jupyterhub/bin/python3 -m pip install wheel jupyterhub jupyterlab ipywidgets
+#     6  /opt/jupyterhub/bin/python3 -m pip install wheel
+#     7  /opt/jupyterhub/bin/pip3 install --upgrade pip
+#     8  /opt/jupyterhub/bin/python3 -m pip install wheel
+#     9  /opt/jupyterhub/bin/python3 -m pip install jupyterhub
+#    10  /opt/jupyterhub/bin/python3 -m pip install jupyterhub
+#    11  /opt/jupyterhub/bin/python3 -m pip install jupyterlab
+#    12  /opt/jupyterhub/bin/python3 -m pip install ipywidgets
+#    13  yum install nodejs
+#    14  curl https://raw.githubusercontent.com/creationix/nvm/v0.37.2/install.sh | bash
+#    15  source ~/.bashrc 
+#    16  nvm --version
+#    17  nvm use 14
+#    18  nvm install 14
+#    19  npm install -g configurable-http-proxy
+#    20  mkdir -p /opt/jupyterhub/etc/jupyterhub/
+#    21  cd /opt/jupyterhub/etc/jupyterhub/
+#    22  /opt/jupyterhub/bin/jupyterhub --generate-config
+#    23  history
+#    24  cat /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    25  wc -l /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    26  head -500 /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    27  cat /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    28  echo "c.Spawner.default_url = '/lab'" > /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    29  cat /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    30  mkdir -p /opt/jupyterhub/etc/systemd
+#    31  cat << EOF > /opt/jupyterhub/etc/systemd/jupyterhub.service
+# [Unit]
+# Description=JupyterHub
+# After=syslog.target network.target
+
+# [Service]
+# User=root
+# Environment="PATH=/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/jupyterhub/bin"
+# ExecStart=/opt/jupyterhub/bin/jupyterhub -f /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+
+# [Install]
+# WantedBy=multi-user.target
+# EOF
+
+#    32  cat /opt/jupyterhub/etc/systemd/jupyterhub.service
+#    33  ln -s /opt/jupyterhub/etc/systemd/jupyterhub.service /etc/systemd/system/jupyterhub.service
+#    34  systemctl daemon-reload
+#    35  systemctl enable jupyterhub.service
+#    36  systemctl start jupyterhub.service
+#    37  systemctl status jupyterhub.service
+#    38  systemctl status jupyterhub.service
+#    39  history
+
+
+# export CONFIGURABLE_HTTP_PROXY=$(nvm which default | sed "s/node$/configurable-http-proxy/")
+# echo "c.ConfigurableHTTPProxy.command = '$CONFIGURABLE_HTTP_PROXY'" >> /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+
+
+#             1  python3
+#     2  yum install python3
+#     3  sudo python3 -m venv /opt/jupyterhub/
+#     4  python3 -m venv /opt/jupyterhub/
+#     5  /opt/jupyterhub/bin/python3 -m pip install wheel jupyterhub jupyterlab ipywidgets
+#     6  /opt/jupyterhub/bin/python3 -m pip install wheel
+#     7  /opt/jupyterhub/bin/pip3 install --upgrade pip
+#     8  /opt/jupyterhub/bin/python3 -m pip install wheel
+#     9  /opt/jupyterhub/bin/python3 -m pip install jupyterhub
+#    10  /opt/jupyterhub/bin/python3 -m pip install jupyterhub
+#    11  /opt/jupyterhub/bin/python3 -m pip install jupyterlab
+#    12  /opt/jupyterhub/bin/python3 -m pip install ipywidgets
+#    13  yum install nodejs
+#    14  curl https://raw.githubusercontent.com/creationix/nvm/v0.37.2/install.sh | bash
+#    15  source ~/.bashrc 
+#    16  nvm --version
+#    17  nvm use 14
+#    18  nvm install 14
+#    19  npm install -g configurable-http-proxy
+#    20  mkdir -p /opt/jupyterhub/etc/jupyterhub/
+#    21  cd /opt/jupyterhub/etc/jupyterhub/
+#    22  /opt/jupyterhub/bin/jupyterhub --generate-config
+#    23  history
+#    24  cat /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    25  wc -l /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    26  head -500 /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    27  cat /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    28  echo "c.Spawner.default_url = '/lab'" > /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    29  cat /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+#    30  mkdir -p /opt/jupyterhub/etc/systemd
+#    31  cat << EOF > /opt/jupyterhub/etc/systemd/jupyterhub.service
+# [Unit]
+# Description=JupyterHub
+# After=syslog.target network.target
+
+# [Service]
+# User=root
+# Environment="PATH=/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/jupyterhub/bin"
+# ExecStart=/opt/jupyterhub/bin/jupyterhub -f /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
+
+# [Install]
+# WantedBy=multi-user.target
+# EOF
+
+#    32  cat /opt/jupyterhub/etc/systemd/jupyterhub.service
+#    33  ln -s /opt/jupyterhub/etc/systemd/jupyterhub.service /etc/systemd/system/jupyterhub.service
+#    34  systemctl daemon-reload
+#    35  systemctl enable jupyterhub.service
+#    36  systemctl start jupyterhub.service
+#    37  systemctl status jupyterhub.service
+#    38  systemctl status jupyterhub.service
+#    39  history
+
+
+# export CONFIGURABLE_HTTP_PROXY=$(nvm which default | sed "s/node$/configurable-http-proxy/")
+# echo "c.ConfigurableHTTPProxy.command = '$CONFIGURABLE_HTTP_PROXY'" >> /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
