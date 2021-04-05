@@ -1,0 +1,1 @@
+This is a sample file to illustrate the artifact provision method. See the project's README.
