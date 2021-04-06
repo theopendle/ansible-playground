@@ -2,12 +2,11 @@
 - hosts: servers
   tasks:
 
-    - name: Install Python 3 and NGINX
+    - name: Install Python 3
       become: true
       yum:
         name: 
           - python3
-          # - nginx
         state: latest
     
     - name: Check if NodeJs repos is set up
@@ -238,7 +237,9 @@
     - name: Install httpd package
       become: true
       yum:
-        name: httpd
+        name: 
+          - httpd
+          - mod_ssl
         state: latest
       
     - name: Create apache user
@@ -279,6 +280,13 @@
         remote_src: true
         src: /prod/pf/work/jupyterhub.conf
         dest : /etc/httpd/conf.d/jupyterhub.conf
+
+    - name: Generate cryptographic elements
+      become: true
+      shell: |
+        set -e
+        mkdir -p /etc/httpd/ssl
+        openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj "/CN=localhost" -keyout /etc/httpd/ssl/localhost.key -out /etc/httpd/ssl/localhost.cert
 
     - name: Start httpd service
       become: true
