@@ -2,11 +2,12 @@
 - hosts: servers
   tasks:
 
-    - name: Install Python 3
+    - name: Install Python 3 and NGINX
       become: true
       yum:
         name: 
           - python3
+          # - nginx
         state: latest
     
     - name: Check if NodeJs repos is set up
@@ -112,7 +113,7 @@
         dest: /opt/jupyterhub/etc/jupyterhub/jupyterhub_config.py
         content: |
           c.Spawner.default_url = '/lab'
-          c.JupyterHub.port = 80
+          c.JupyterHub.bind_url = 'http://:8080'
           c.Authenticator.allowed_users = {'app_admin'}
           c.Authenticator.admin_users = {'app_admin'}
 
@@ -216,7 +217,7 @@
         state: present
         line: 'jupyter ALL=(ALL) NOPASSWD: JUPYTERHUB_ADMIN'
 
-    - name: Start service
+    - name: Start Jupyter Hub service
       become: true
       systemd:
         name: jupyterhub
@@ -233,3 +234,54 @@
         uid: 2002
         home: /home/app_admin
         shell: /bin/bash
+        
+    - name: Install httpd package
+      become: true
+      yum:
+        name: httpd
+        state: latest
+      
+    - name: Create apache user
+      become: true
+      user:
+        name: apache
+        uid: 2003
+        home: /home/apache
+        shell: /bin/bash
+
+    - name: Set permissions on server configuration
+      become: true
+      file: 
+        dest: /etc/httpd
+        owner: apache
+        group: apache
+        mode: u=rwx,g=rwx,o=rx
+        recurse: yes
+
+    - name: Create Apache administration command alias
+      become: true
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        line: 'Cmnd_Alias APACHE_ADMIN = /usr/bin/systemctl start httpd.service, /usr/bin/systemctl stop httpd.service'
+
+    - name: Grant httpd admin rights to apache user
+      become: true
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        line: 'apache ALL=(ALL) NOPASSWD: APACHE_ADMIN'
+
+    - name: Create Jupyter Hub Apache configuration
+      become: true
+      become_user: apache
+      copy: 
+        remote_src: true
+        src: /prod/pf/work/jupyterhub.conf
+        dest : /etc/httpd/conf.d/jupyterhub.conf
+
+    - name: Start httpd service
+      become: true
+      systemd:
+        state: started
+        name: httpd
