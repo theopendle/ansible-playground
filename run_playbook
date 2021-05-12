@@ -1,3 +1,7 @@
 #!/bin/bash
 
-docker exec -it ansible-server bash -c "/run_playbook.sh ${1}"
+command="/run_playbook.sh ${@}"
+
+echo "${command}"
+
+docker exec -it ansible-controller bash -c "${command}"

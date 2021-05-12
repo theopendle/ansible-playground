@@ -1,7 +1,9 @@
 #!/bin/bash
 
+sshpass -p ansible ssh-copy-id -o "StrictHostKeyChecking no" -i $HOME/.ssh/id_rsa ansible@ansible-target
 
-echo "Executing $1"
-sshpass -p ansible ssh-copy-id -i $HOME/.ssh/id_rsa ansible@ansible-target
+command="ansible-playbook ${@}"
 
-ansible-playbook /playbooks/$1
+echo "Executing ${command}"
+
+bash -c "${command}"
