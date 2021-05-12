@@ -20,13 +20,13 @@ services:
       - 6443:443
     privileged: true
 
-  server:
-    build: ansible-server
-    image: ansible-server 
+  controller:
+    build: ansible-controller
+    image: ansible-controller 
     depends_on:
       - target
-    container_name: ansible-server
-    image: ansible-server
+    container_name: ansible-controller
+    image: ansible-controller
     networks:
       - network
     volumes:

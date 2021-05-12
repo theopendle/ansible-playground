@@ -8,7 +8,7 @@ This project serves to create a minimal playground for writing and testing ansib
 
 This solution takes teh form of two docker containers:
 
-1. The ansible server: runs ansible and is used to execute the playbooks
+1. The ansible controller: runs ansible and is used to execute the playbooks
 2. The target server: empty CentOS container in to be configured by the ansible playbooks
 
 ## How to use
@@ -37,7 +37,7 @@ cp /tmp/httpd_playbook.yaml playbooks/
 
 ### Trigger execution
 
-Once your playbook is in the volume directory, you can tell the ansible-server container to execute it using the `run_playbook` bash script:
+Once your playbook is in the volume directory, you can tell the ansible-controller container to execute it using the `run_playbook` bash script:
 
 ```bash
 ./run_playbook <your-playbook-name>
