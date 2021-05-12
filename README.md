@@ -18,7 +18,7 @@ This solution takes teh form of two docker containers:
 Use the following commands to build and run the environment from scratch:
 
 ```bash
-docker-compose rm && docker-compose build && docker-compose up
+docker build -t ansible-common ansible-common && docker-compose rm && docker-compose build && docker-compose up
 ```
 
 ### Provide an ansible playbook
