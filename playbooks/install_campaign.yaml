@@ -1,0 +1,145 @@
+---
+- hosts: servers
+  become: true
+
+  vars:
+      httpd_modules_to_disable:
+        - auth_basic
+        - authn_file
+        - authz_user
+        - autoindex
+        - cgi
+        - dir
+        - env
+        - negotiation
+        - userdir
+
+      conf_modules_d_to_disable:
+        - cgi
+
+      conf_d_to_disable:
+        - autoindex
+
+      prerequisite_packages:
+          - c-ares
+          - xorg-x11-fonts-base
+          - xorg-x11-fonts-75dpi
+          - ipa-gothic-fonts
+          - ipa-mincho-fonts
+          - ipa-gothic-fonts
+          - ipa-mincho-fonts
+          - libreoffice-headless
+          - libreoffice-writer
+          - libreoffice-calc
+          - bc.x86_64
+
+
+  tasks:
+
+##############################################################################
+##                           Apache web server                              ##
+##############################################################################
+    - name: Install Apache Web Server
+      yum:
+        name: httpd
+
+    - name: Create campaign group
+      group:
+        name: campaign
+        state: present
+
+    - name: Create Apache Web Server home directory
+      file:
+        state: directory
+        path: /usr/local/neolane/httpd
+        owner: apache
+        group: campaign
+        mode: u=rwx,g=rwx,o=rx,g+s
+
+    - name: Create Apache Web Server conf.d directory
+      file:
+        state: directory
+        path: /usr/local/neolane/httpd/conf.d
+        owner: apache
+        group: campaign
+
+    - name: Check if httpd configuration are disabled in /etc/httpd/conf.modules.d
+      loop: "{{ conf_modules_d_to_disable }}"
+      find:
+        path: "/etc/httpd/conf.modules.d"
+        use_regex: true
+        patterns: '.*-{{ item }}.conf'
+      register: conf_modules_d
+
+    - name: Disable unneeded httpd configurations in /etc/httpd/conf.modules.d
+      loop: "{{ conf_modules_d.results }}"
+      when: item.matched > 0
+      command: "mv {{ item.files[0].path }} {{ item.files[0].path }}.disabled"
+
+    - name: Check if httpd configuration are disabled in /etc/httpd/conf.d
+      loop: "{{ conf_d_to_disable }}"
+      find:
+        path: "/etc/httpd/conf.d"
+        use_regex: true
+        patterns: '{{ item }}.conf'
+      register: conf_d
+
+    - name: Disable unneeded httpd configurations in /etc/httpd/conf.d
+      loop: "{{ conf_d.results }}"
+      when: item.matched > 0
+      command: "mv {{ item.files[0].path }} {{ item.files[0].path }}.disabled"
+
+    - name: Unload unneeded httpd modules
+      loop: "{{ httpd_modules_to_disable }}"
+      replace: 
+        path: /etc/httpd/conf.modules.d/00-base.conf
+        regexp: '^(LoadModule {{ item }}.*)$'
+        replace: '# \1'
+
+
+##############################################################################
+##                               Campaign                                   ##
+##############################################################################
+    - name: Install pre-requisites
+      yum:
+        name: "{{ prerequisite_packages }}"
+        state: latest
+
+    - name: Install Campaign
+      yum:
+        name: "/artifacts/{{ campaignRpm }}"
+        state: present
+
+    - name: Check if server locale is en_US.iso885915
+      shell: locale -a | { grep -E "en_US.iso885915" || true; }
+      register: locale
+      changed_when: locale.stdout_lines|length < 1
+
+    - name: Set Server locale to en_US.iso885915
+      when: locale.changed
+      command: localedef -i en_US -f ISO-8859-15 en_US.ISO-8859-15
+
+    - name: Create customer.sh
+      copy:
+        dest: /usr/local/neolane/nl6/customer.sh
+        content: |
+          export JDK_HOME=$(realpath $(which java) | cut -d / -f -5)
+
+    # - name: Verify Campaign installation
+    #   become_user: neolane
+    #   shell: source $HOME/nl6/env.sh && nlserver pdump | { grep -E "No tasks" || true; }
+    #   ignore_errors: true
+    #   register: verify_campaign
+    #   failed_when: locale.stdout_lines|length < 1
+    #   changed_when: locale.failed
+
+    # - name: Check if Campaign has been initialized
+    #   stat:
+    #       path: /usr/local/neolane/nl6/conf/serverConf.xml
+    #   register: initialized
+
+    # - name: Initialize Campaign
+    #   when: not initialized.stat.exists
+    #   become_user: neolane
+    #   shell: source $HOME/nl6/env.sh && nlserver web
+    #   register: init_campaign
