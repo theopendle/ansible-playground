@@ -1,0 +1,233 @@
+﻿<?xml version='1.0'?>
+<serverConf>
+    <shared>
+
+        <authentication checkIPConsistent="false" defaultMode="nl" longSessionTimeOutSec="1296000" securityTimeOutSec="86400" sessionCacheMax="1000" sessionCacheSec="600" sessionTimeOutSec="86400">
+            <xtk internalPassword="" internalSecurityZone="lan" />
+        </authentication>
+
+        <dataStore decryptKeyPath="/v1/campaign-transit/decrypt/" encryptKeyPath="/v1/campaign-transit/encrypt/" exportDirectory="$(XTK_INSTALL_DIR)/var/$(INSTANCE_NAME)/export/" extraSandboxedDirectories="/home/customers/,/sftp/" formCacheTimeToLive="600" hosts="*" interactionCacheTimeToLive="300" lang="" transitKey="" uploadDirectory="$(XTK_INSTALL_DIR)/var/$(INSTANCE_NAME)/upload/" uploadWhitelist=".+" useVault="false" vaultTokenPath="$(HOME)/.vault_token" vaultUrl="https://vault-amer.adobe.net" viewCacheTimeToLive="600" workingDirectory="$(XTK_INSTALL_DIR)/var/$(INSTANCE_NAME)/workspace/">
+            <proxyAdjust urlBase="" urlRegEx="" />
+
+            <dataSource name="default" options="keepalives=1;connect_timeout=30;keepalives_idle=30;keepalives_interval=30;keepalives_count=2">
+                <dbcnx NChar="" bulkCopyUtility="" dbSchema="" encrypted="" login="" maxRetries="2" password="" provider="" server="" timezone="" unicodeData="" useTimestampTZ="" />
+                <sqlParams funcPrefix="">
+                    <postConnectSQL />
+                </sqlParams>
+                <pool aliveTestDelaySec="600" freeCnx="0" maxCnx="50" maxIdleDelaySec="1200" />
+            </dataSource>
+
+            <virtualDir name="images" path="$(XTK_INSTALL_DIR)/var/res/img/" />
+            <virtualDir name="formCache" path="$(XTK_INSTALL_DIR)/var/$(INSTANCE_NAME)/formCache/" />
+            <virtualDir name="publicFileRes" path="$(XTK_INSTALL_DIR)/var/res/$(INSTANCE_NAME)" />
+
+            <preprocessCommand command="" label="None" name="none" />
+            <preprocessCommand command="zcat &quot;$fileName&quot;" label="Decompression" name="zcat" />
+            <preprocessCommand command="gpg --decrypt &quot;$fileName&quot;" label="Decrypt" name="gpg" />
+
+        </dataStore>
+
+        <dnsConfig localDomain="" nameServers="" retry="4" timeout="5000" />
+        <exec blacklistFile="" user="" />
+
+        <htmlToPdf command="" maxProcessusCount="5" mode="phantomjs" timeout="120" verbose="false" waitTime="15" />
+
+        <javaScript maxMB="512" stackSizeKB="8" />
+
+        <lineServlet connectionTimeout="60" readTimeout="60" />
+
+        <mailExchanger mxAddress="" mxPort="25" />
+
+        <module defaultNameSpace="cus" />
+
+        <monitoring appName="Adobe Campaign Classic" enable="false" maxPreparationJobsSec="3600" newRelicConnectionToDaemonWaitTimeMs="" newRelicDaemonCreationWaitTimeMs="" newRelicLicense="" newRelicThresholdTransactionTraceUs="" unixScript="" winScript="" />
+
+        <ooconv maxConversions="1000" maxServerIdleSec="7200" portRange="8101-8110" url="http://localhost:8080/nl/jsp/ooconv.jsp" />
+
+        <proxyConfig enabled="false" override="localhost*" useSingleProxy="false">
+            <proxyHTTP address="" login="" password="" port="" />
+            <proxyHTTPS address="" login="" password="" port="" />
+            <proxyFTP address="" login="" password="" port="" />
+        </proxyConfig>
+
+        <replicationThreadPool enable="true" replicationThreadCount="3" waitTimeConsecutiveUpdateMs="10000" />
+
+        <threadPool maxThreadCount="10" />
+
+        <urlPermission action="" debugTrace="false">
+            <url dnsSuffix="api.omniture.com" urlRegEx="https://api\.omniture\.com/genesis/i/3\.1.*" />
+            <url dnsSuffix="omniture.com" urlRegEx="https://api[1-5]\.omniture\.com/genesis/i/3\.1.*" />
+            <url dnsSuffix="marketing.adobe.com" urlRegEx="https://.*" />
+            <url dnsSuffix="fcm.googleapis.com" urlRegEx="https://fcm\.googleapis\.com/.*" />
+            <url dnsSuffix="graph.facebook.com" urlRegEx="https://.*" />
+            <url dnsSuffix="api.line.me" urlRegEx="https://api\.line\.me/.*" />
+            <url dnsSuffix="api.twitter.com" urlRegEx="https://api\.twitter\.com/1\.1.*" />
+            <url dnsSuffix="adobeid-na1.services.adobe.com" urlRegEx="https://.*" />
+            <url dnsSuffix="adobeid-na1-stg1.services.adobe.com" urlRegEx="https://.*" />
+            <url dnsSuffix="deliverability.neolane.net" urlRegEx="https://deliverability\.neolane\.net/jssp/dm/renderingSeed\.jssp" />
+            <url dnsSuffix="deliverability.neolane.net" urlRegEx="https://deliverability\.neolane\.net/nl/jsp/soaprouter\.jsp" />
+            <url dnsSuffix="localhost" urlRegEx="http://localhost:8080/nms/jsp/.*" />
+            <url dnsSuffix="localhost" urlRegEx="http://localhost:8080/nl/jsp/.*" />
+            <url dnsSuffix="localhost" urlRegEx="http://localhost:8080/xtk/jsp/.*" />
+            <url dnsSuffix="heatmapservice-dev-va7.dev.cloud.adobe.io" urlRegEx="https://heatmapservice-dev-va6\.dev\.cloud\.adobe\.io/.*" />
+            <url dnsSuffix="heatmapservice-stage-va7.dev.cloud.adobe.io" urlRegEx="https://heatmapservice-stage-va6\.dev\.cloud\.adobe\.io/.*" />
+            <url dnsSuffix="heatmapservice-production-va7.cloud.adobe.io" urlRegEx="https://heatmapservice-production-va6\.cloud\.adobe\.io/.*" />
+
+        </urlPermission>
+
+        <xtkJobs parseLogsPeriod="500" />
+
+
+    </shared>
+
+    <archiving acquireLimit="5000" archivingType="" args="" autoStart="false" compressBatchSize="10000" compressionFormat="" expirationDelay="2" initScript="" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" pollDelay="600" processRestartTime="06:00:00" purgeArchivesDelay="7" runLevel="10" smtpBccAddress="" smtpEnableTLS="false" smtpNbConnection="2" smtpRelayAddress="" smtpRelayPort="25" />
+
+    <deliverability dServerEndpoint="https://deliverability-service.adobe.io" />
+
+    <ims allowedIMSServiceClientId="campaign_io" authIMSClientId="" authIMSClientSecret="" authIMSCode="" authIMSEndpoint="https://ims-na1.adobelogin.com" authIMSTAClientId="" authIMSTAClientSecret="" authIMSTAId="" authIMSTAPrivateKey="" />
+
+    <inMail args="" autoStart="false" checkInstanceName="true" defaultForwardAddress="" errorForwardAddress="" ignoreSize="false" inMailPeriodSec="5" initScript="" maxBroadLog="20" maxMsgPerSession="200" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" maxSessionTTLSec="100" popMailPeriodSec="300" popQueueSize="100" popTimeoutSec="300" processRestartTime="06:00:00" reloadPeriodSec="600" runLevel="10">
+        <msgDump dump="false" msgPath="/tmp/inMail" />
+    </inMail>
+
+    <interactiond args="" autoStart="false" callDataSize="0" initScript="" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" maxSharedEntries="25000" nextOffersSize="0" processRestartTime="06:00:00" runLevel="10" statsPeriod="600" targetKeySize="16" />
+
+    <mta args="-tracefilter:nlmta" autoStart="false" dataLogPath="" debugPath="" dnsRequestLogDelayMs="" errorPeriodSec="300" initScript="" logEmailErrors="true" logLevel="2" maxMemoryMb="1024" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" minConnectionsToLog="100" minErrorsToLog="1" minMessagesToLog="1000" notifRelay="" processRestartTime="06:00:00" purgeDataLogDelay="15" retryLostMessages="true" runLevel="10" signEmailLinks="true" statServerAddress="" statServerTLSSupport="true" statServerVersion="" useMomentum="false" verifyMode="false" workingPath="$(XTK_INSTALL_DIR)/var/$(INSTANCE_NAME)/mta/" xMailer="nlserver, Build $(PRODUCT_VERSION)">
+        <cache maxPeriodSec="244800" maxSizeOnDiskMb="1024" purgePeriodSec="3600" />
+        <relay address="" port="25" />
+        <master dataBasePoolPeriodSec="30" dataBaseRetryDelaySec="60" domainKeysReloadPeriodSec="600" maxBatchSize="10000" maxSpareServers="2" minSpareServers="0" startSpareServers="0" />
+        <child broadcastTimerMs="1000" dryRun="false" extraArgs="" fcmEndpointUrl="" googleOAuthServer="https://accounts.google.com/o/oauth2/token" googleOAuthsScope="https://www.googleapis.com/auth/firebase.messaging" idleChildTimeoutSec="60" maxAgeSec="600" maxGCMConnectPerChild="8" maxMsgPerChild="5000000" maxWaitingMessages="2000" maxWorkingSetMb="128" soapConnectorTimeoutSec="600" startWithFirstMX="false" timeToLive="48">
+            <smtp enableTLS="false" idleSessionTimeoutSec="5" initialDelaySec="4" maxSessionsPerChild="1000"></smtp>
+        </child>
+    </mta>
+
+    <nmac useHTTPProxy="false">
+        <relay address="" port="443" trustedCertsChain="" />
+    </nmac>
+
+    <pipelined appName="" args="" authGatewayEndpoint="https://api.omniture.com" authPrivateKey="" authType="" autoStart="false" batchUpdateDelaySec="1" batchUpdateSize="500" configServerEndpoint="https://configserver.adobe.io" disableAuth="" discoverPipelineEndpoint="https://producer-pipeline-pnw.adobe.net" dumpStatePeriodSec="0" forcedPipelineEndpoint="" initScript="" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" monitorServerPort="7781" pointerFlushMessageCount="1000" pointerFlushPeriodSec="5" processRestartTime="06:00:00" processingJSThreads="4" processingThreads="4" retryPeriodSec="30" retryValiditySec="300" runLevel="10" />
+
+    <predictive url="http://localhost:8080" />
+
+    <repair repairActionDelayMin="60" />
+
+    <securityZone allowDebug="false" allowHTTP="false" allowSQLInjection="false" label="Public Network" name="public">
+        <subNetwork label="All addresses" mask="*" name="all" proxy="127.0.0.1, ::1" />
+        <securityZone allowDebug="true" allowHTTP="false" allowSQLInjection="false" label="Private Network (VPN)" name="vpn" showErrors="true">
+            <securityZone allowDebug="true" allowEmptyPassword="false" allowHTTP="true" allowSQLInjection="false" allowUserPassword="false" label="Private Network (LAN)" name="lan" sessionTokenOnly="true" showErrors="true">
+                <subNetwork label="Lan 1" mask="192.168.0.0/16" name="lan1" proxy="127.0.0.1, ::1" />
+                <subNetwork label="Lan 2" mask="172.16.0.0/12" name="lan2" proxy="127.0.0.1, ::1" />
+                <subNetwork label="Lan 3" mask="10.0.0.0/8" name="lan3" proxy="127.0.0.1, ::1" />
+                <subNetwork label="Localhost" mask="127.0.0.0/8" name="localhost" proxy="127.0.0.1, ::1" />
+                <subNetwork label="Lan (IPv6)" mask="fc00::/7" name="lan6" proxy="127.0.0.1, ::1" />
+                <subNetwork label="Lan (IPv6)" mask="fe80::/10" name="lan6b" proxy="127.0.0.1, ::1" />
+                <subNetwork label="Localhost (IPv6)" mask="::1/128" name="localhost6" proxy="127.0.0.1, ::1" />
+            </securityZone>
+        </securityZone>
+    </securityZone>
+
+    <sms args="" autoStart="false" dataRetentionDays="60" dataSizeMo="512" initScript="" keepAlivePeriod="25" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" pollPeriod="300" processRestartTime="06:00:00" reloadPeriod="600" runLevel="10" srReadDelay="600" timeout="300">
+        <netsize netsizeConnectionTimeout="30" />
+    </sms>
+
+    <stat args="" autoStart="false" initScript="" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" port="" processRestartTime="06:00:00" runLevel="10" />
+
+    <syslogd args="" autoStart="false" initScript="" maxFileSizeMb="10" maxNumberOfLoginsFiles="365" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" processRestartTime="06:00:00" runLevel="10" />
+
+    <tracking args="" autoStart="false" blockRedirectForUnsignedTrackingLink="false" consolidationPeriodSec="300" dedupOpenPeriodMin="1" errorIgnorePercent="1" errorIgnorePeriod="86400" indicatorsDuration="2592000" initScript="" logCountPerRequest="1000" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" maxRedirDownloadNb="60" minRedirDownloadTime="120000" phishbowlServiceAPIKey="" phishbowlServiceConnectTimeout="300" phishbowlServiceEndpoint="" processRestartTime="06:00:00" runLevel="10" trackingIgnorePercent="1" trackingIgnorePeriod="86400" urlsInMemoryCacheSize="1000" />
+
+    <trackinglogd args="" autoStart="false" initScript="" maxCreateFileRetry="5" maxLogsSizeOnDiskMb="500" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" maxSharedLogs="25000" processRestartTime="06:00:00" purgeLogsPeriod="50000" runLevel="10" webTrackingParamSize="64" />
+
+    <web JVMOptions="" MaxThreads="75" MinSpareThreads="5" args="" autoStart="false" controlPort="8005" httpPort="8080" initScript="" maxDeliveryQueueSize="50" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" notifRelay="" processRestartTime="06:00:00" runLevel="10" startSoapRouterInModule="false">
+        <jsp debug="" downloadPath="$(XTK_INSTALL_DIR)/datakit/nl/eng/jsp" foFileName="" soapRouter="http://jni">
+            <classpath>$(XTK_INSTALL_DIR)/tomcat-8/bin/bootstrap.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/bin/tomcat-juli.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/annotations-api.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/catalina-ha.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/catalina.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/ecj-4.6.3.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/el-api.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/jaspic-api.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/jasper-el.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/jasper.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/jsp-api.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/servlet-api.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/tomcat-api.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/tomcat-coyote.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/tomcat-jni.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/tomcat-util.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/tomcat-util-scan.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/tomcat-websocket.jar
+          $(XTK_INSTALL_DIR)/tomcat-8/lib/websocket-api.jar
+          $(XTK_INSTALL_DIR)/java/lib/log4j-1.2.11.jar
+          $(XTK_INSTALL_DIR)/java/lib/AGJavaEndpoint.22.jar
+          $(XTK_INSTALL_DIR)/java/lib/NSGConstants.jar
+          $(XTK_INSTALL_DIR)/java/lib/smpp.jar
+          $(XTK_INSTALL_DIR)/java/lib/nlweb.jar
+          $(XTK_INSTALL_DIR)/java/lib/jcaptcha-all.jar
+          $(XTK_INSTALL_DIR)/java/lib/org-apache-commons-codec.jar
+          $(XTK_INSTALL_DIR)/java/lib/commons-collections-3.2.2.jar
+          $(XTK_INSTALL_DIR)/java/lib/jcommon-1.0.16.jar
+          $(XTK_INSTALL_DIR)/java/lib/jfreechart-1.0.13.jar
+          $(XTK_INSTALL_DIR)/java/lib/barcode4j-light.jar
+          $(XTK_INSTALL_DIR)/java/lib/zxing.jar
+          $(XTK_INSTALL_DIR)/java/lib/raztec.jar
+          $(XTK_INSTALL_DIR)/java/lib/gson-2.6.2.jar
+          $(XTK_INSTALL_DIR)/java/lib/alpn-api-1.1.3.v20160715.jar
+          $(XTK_INSTALL_DIR)/java/lib/netty-all-4.1.48.Final.jar
+          $(XTK_INSTALL_DIR)/java/lib/netty-tcnative-boringssl-static-2.0.26.Final.jar
+          $(XTK_INSTALL_DIR)/java/lib/pushy-0.13.9.jar
+          $(XTK_INSTALL_DIR)/java/lib/fast-uuid-0.1.jar
+          $(XTK_INSTALL_DIR)/java/lib/slf4j-api-1.7.21.jar
+          $(XTK_INSTALL_DIR)/java/lib/slf4j-simple-1.7.21.jar
+          $(XTK_INSTALL_DIR)/java/lib/okapibarcode-0.2.3.jar</classpath>
+        </jsp>
+
+        <jssp collectsGarbageAfterRequest="true" timeToLive="1000" />
+
+        <relay debugRelay="false" forbiddenCharsInAuthority=".?#@/:" forbiddenCharsInPath="?#/" modDir="index.html" startRelay="false" startRelayInModule="true" timeout="60">
+            <url IPMask="" deny="" hostMask="" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:7781" timeout="" urlPath="/pipelined/*" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="false" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/view/*" />
+            <url IPMask="" deny="true" hostMask="" httpAllowed="false" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="*ooconv.jsp*" />
+            <url IPMask="" deny="true" hostMask="" httpAllowed="false" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/res/*.jsp*" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="*/sc.jssp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="*/interactionProposal.jssp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="*/zoneJson.jssp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/nms/jsp/barcode.jsp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/nms/jsp/captcha.jsp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/nms/jsp/webForm.jsp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/xtk/jsp/zoneinfo.jsp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="*/facebookCallback.jssp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/nl/jsp/m.jsp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/nl/jsp/s.jsp" />
+
+            <url IPMask="" deny="" hostMask="" httpAllowed="false" relayHost="true" relayPath="true" status="blacklist" targetUrl="http://localhost:8080" timeout="" urlPath="/nms/jsp/*.jsp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="false" relayHost="true" relayPath="true" status="blacklist" targetUrl="http://localhost:8080" timeout="" urlPath="/xtk/jsp/*.jsp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="false" relayHost="true" relayPath="true" status="blacklist" targetUrl="http://localhost:8080" timeout="" urlPath="/nl/jsp/*.jsp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="false" relayHost="true" relayPath="true" status="blacklist" targetUrl="http://localhost:8080" timeout="" urlPath="*.jssp" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="blacklist" targetUrl="http://localhost:8080" timeout="" urlPath="/webApp/*" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="false" relayHost="true" relayPath="true" status="blacklist" targetUrl="http://localhost:8080" timeout="" urlPath="/report/*" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="false" relayHost="true" relayPath="true" status="blacklist" targetUrl="http://localhost:8080" timeout="" urlPath="/jssp/*" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="false" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/strings/*" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/interaction/*" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/barcode/*" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="true" relayPath="true" status="normal" targetUrl="http://localhost:8080" timeout="" urlPath="/lineImage/*" />
+
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="false" relayPath="false" status="spare" targetUrl="" timeout="" urlPath="/favicon.*" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="false" relayPath="false" status="spare" targetUrl="" timeout="" urlPath="/*.html" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="false" relayPath="false" status="spare" targetUrl="" timeout="" urlPath="/*.png" />
+            <url IPMask="" deny="" hostMask="" httpAllowed="true" relayHost="false" relayPath="false" status="spare" targetUrl="" timeout="" urlPath="/*.jpg" />
+
+            <responseHeader name="X-XSS-Protection" value="1; mode=block" />
+        </relay>
+
+        <redirection IMSOrgId="" P3PCompactPolicy="CAO DSP COR CURa DEVa TAIa OUR BUS IND UNI COM NAV" cookieDomain="" databaseId="" defLogCount="30" expirationURL="" maxJobsInCache="100" startRedirection="true" startRedirectionInModule="true" trackWebVisitors="false" trackingPassword="">
+            <spareServer enabledIf="" id="1" url="" />
+        </redirection>
+        <spamCheck command="" />
+
+    </web>
+
+    <wfserver affinity="" args="" autoStart="false" dataBasePoolPeriodSec="20" initScript="" maxProcessMemoryAlertMb="1800" maxProcessMemoryWarningMb="1600" notifRelay="" processRestartTime="06:00:00" runLevel="10" />
+
+</serverConf>
