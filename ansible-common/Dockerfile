@@ -8,5 +8,5 @@ RUN echo "root:root" | chpasswd && \
     yum -y install sudo openssh-clients && \
     yum -y clean all
 
-RUN useradd -m -s /bin/bash -u 2000 ansible && \
+RUN useradd -ms /bin/bash ansible && \
     echo "ansible:ansible" | chpasswd
