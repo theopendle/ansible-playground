@@ -1,3 +1,3 @@
-from ansible-base
+FROM ansible-base
 
 # Add specific configuration here
