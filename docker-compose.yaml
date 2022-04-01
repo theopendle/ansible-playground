@@ -1,34 +1,23 @@
 version: "3.7"
 
 networks:
-  network:
+  playground:
     driver: bridge
 
 services:
 
-  target: 
-    build: ansible-target
-    image: ansible-target 
-    container_name: ansible-target
+  ansible-target:
     image: ansible-target
+    build: ansible-target
+    container_name: ansible-target
     networks:
-      - network
+      - playground
+    ports:
+      - "6022:22"
+      - "6880:8080"
+      - "6080:80"
+      - "6443:443"
     volumes:
       - ./artifacts:/artifacts
-    ports:
-      - 6080:80
-      - 6443:443
     privileged: true
-
-  controller:
-    build: ansible-controller
-    image: ansible-controller 
-    depends_on:
-      - target
-    container_name: ansible-controller
-    image: ansible-controller
-    networks:
-      - network
-    volumes:
-      - ./playbooks:/playbooks
-    tty: true
+    hostname: ansible-target
