@@ -1,7 +1,0 @@
-#!/bin/bash
-
-command="/run_playbook.sh ${@}"
-
-echo "${command}"
-
-docker exec -it ansible-controller bash -c "${command}"

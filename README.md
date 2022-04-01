@@ -6,11 +6,6 @@ This project serves to create a minimal playground for writing and testing ansib
 
 ![Architecure](./doc/architecture.png)
 
-This solution takes teh form of two docker containers:
-
-1. The ansible controller: runs ansible and is used to execute the playbooks
-2. The target server: empty CentOS container in to be configured by the ansible playbooks
-
 ## How to use
 
 ### Run the environment
@@ -18,48 +13,43 @@ This solution takes teh form of two docker containers:
 Use the following commands to build and run the environment from scratch:
 
 ```bash
-docker build -t ansible-common ansible-common && docker-compose rm && docker-compose build && docker-compose up
+docker build ansible-base -t ansible-base && docker-compose kill; docker-compose rm -f && docker-compose build && docker-compose up -d
 ```
 
-### Provide an ansible playbook
+### Create SSH aliases for the containers
 
-The environment includes a volume mounted on the `playbooks` directory. To provide an ansible playbook, simply code in that location, or copy an existing file to that location:
+In order to connect to the containers via SSH (asnible requires this), you must first create an alias, like so:
 
 ```bash
-cp <you-playbook-path> playbooks
+echo "
+# BEGIN: Added for ansible-playground
+Host ansible-target
+    HostName 127.0.0.1
+    Port 6022
+# END: Added for ansible-playground
+" > ~/.ssh/config
 ```
 
-For example:
+Now connect to the container(s) for the first time to load their ECDSA fingerprint using credentials `root:root`, like so:
 
 ```bash
-cp /tmp/httpd_playbook.yaml playbooks/
+ssh root@ansible-target
 ```
 
-### Trigger execution
+### Create ansible hosts for the containers
 
-Once your playbook is in the volume directory, you can tell the ansible-controller container to execute it using the `run_playbook` bash script:
-
+Now declare the containers as hosts to ansible, like so:
 ```bash
-./run_playbook <your-playbook-name>
+echo "
+# BEGIN: Added for ansible-playground
+ansible-target   ansible_host=ansible-target      ansible_port=6022   ansible_user=root   ansible_password=root
+# END: Added for ansible-playground
+" > /etc/ansible/hosts
 ```
-For example:
 
+### Execute a playbook
+
+You can now execute a playbook on your container, like so:
 ```bash
-./run_playbook httpd_playbook.yaml
+ansible-playbook --limit ansible-target playbooks/hello_world.yaml
 ```
-
-The output from the execution of the playbook will be printed to the console.
-
-### Providing artifacts
-
-If your playbook requires some artifacts (binary files, installers, assets, etc.) then you can place them in `artifacts` and they will be loaded into the target container at the same location. If you would like your artifacts to be loaded elswhere, change the following line in the `docker-compose.yaml` file:
-
-```yaml
-./artifacts:/artifacts
-```
-
-### Testing the result
-
-If your playbook completes successfully, you can test the result by interacting with the ansible-target container. The `httpd_playbook.yaml` example file installs and runs a httpd server with a customized default page. You can test it by accessing the `http://localhost:6080` URL in your browser.
-
-By default the HTTP and HTTPS ports are exposed on `6080` and `6443` respectively. If you wish to expose other ports, you will have to modify the `ansible-target/Dockerfile` file.
