@@ -6,11 +6,6 @@ This project serves to create a minimal playground for writing and testing ansib
 
 ![Architecure](./doc/architecture.png)
 
-This solution takes teh form of two docker containers:
-
-1. The ansible controller: runs ansible and is used to execute the playbooks
-2. The target server: empty CentOS container in to be configured by the ansible playbooks
-
 ## How to use
 
 ### Run the environment
@@ -20,10 +15,6 @@ Use the following commands to build and run the environment from scratch:
 ```bash
 docker build ansible-base -t ansible-base && docker-compose kill; docker-compose rm -f && docker-compose build && docker-compose up -d
 ```
-
-## Set up tools
-
-You will need `ansible` installed on your host machine.
 
 ### Create SSH aliases for the containers
 
@@ -47,7 +38,7 @@ ssh root@ansible-target
 
 ### Create ansible hosts for the containers
 
-Now let declare the containers as hosts to ansible, like so:
+Now declare the containers as hosts to ansible, like so:
 ```bash
 echo "
 # BEGIN: Added for ansible-playground
